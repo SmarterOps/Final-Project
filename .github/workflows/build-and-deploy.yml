@@ -22,13 +22,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # 🏗️ Stage 3: Build and Push Image
-  Build-and-Push-Image:
-    runs-on: ubuntu-latest
-    needs: Checkout-Repo-and-Login-to-Docker-hub
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
 
       - name: Extract Metadata (Tags, Labels) for Docker
         id: meta
