@@ -3,7 +3,7 @@ replicaCount: 2
 
 image:
   repository: smarterops/final-project
-  tag: "6fe7ad4f3b08a580feebefdb1c15186cbf843c11"
+  tag: "5f78fe0db82177a1cff870eeba034afc60912232"
   pullPolicy: IfNotPresent
 
 service:
