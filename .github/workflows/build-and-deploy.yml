@@ -50,12 +50,6 @@ jobs:
         run: git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/SmarterOps/Final-Project.git
 
       # 📝 Stage 5: Change values.yaml & Push to Repo
-  Update-Values-yaml:
-    runs-on: ubuntu-latest
-    needs: setup-repo
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4    
       - name: Update Helm values.yaml
         run: |
           sed -i 's/tag:.*/tag: "${{ github.sha }}"/' helm/values.yaml
