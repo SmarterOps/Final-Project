@@ -64,3 +64,4 @@ jobs:
           git pull --rebase origin master || echo "No changes to pull"
           git stash pop || echo "Nothing to pop"
           git push origin master || echo "No changes to push"
+          
