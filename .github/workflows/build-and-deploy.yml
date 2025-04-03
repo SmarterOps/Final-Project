@@ -32,7 +32,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: smarterops/final-project:${{ github.sha }}
+          tags: smarterops/final-project:${{ github.run_number }}
 
   setup-repo:
     runs-on: ubuntu-latest
@@ -52,14 +52,14 @@ jobs:
 
       - name: Update Helm values.yaml
         run: |
-          sed -i 's/tag:.*/tag: "${{ github.sha }}"/' helm/values.yaml
+          sed -i 's/tag:.*/tag: "${{ github.run_number }}"/' helm/values.yaml
 
       - name: Commit and Push Changes
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add helm/values.yaml
-          git diff --cached --quiet || git commit -m "Update Helm tag to ${{ github.sha }}"
+          git diff --cached --quiet || git commit -m "Update Helm tag to ${{ github.run_number }}"
           git stash || echo "Nothing to stash"
           git pull --rebase origin master || echo "No changes to pull"
           git stash pop || echo "Nothing to pop"
