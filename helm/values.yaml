@@ -1,0 +1,19 @@
+# helm/values.yaml
+replicaCount: 2
+
+image:
+  repository: smarterops/final-project
+  tag: "6fe7ad4f3b08a580feebefdb1c15186cbf843c11"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "250m"
+    memory: "256Mi"

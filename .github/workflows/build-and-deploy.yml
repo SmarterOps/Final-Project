@@ -1,0 +1,90 @@
+name: Build and Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # 🛒 Stage 1: Checkout Repository
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }} # ✅ Use PAT for authentication
+
+  # 🔐 Stage 2: Login to Docker
+  login-to-docker:
+    runs-on: ubuntu-latest
+    needs: checkout
+    steps:
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  # 🏗️ Stage 3: Build and Push Docker Image
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    needs: login-to-docker
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Extract Metadata (Tags, Labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: smarterops/final-project
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: smarterops/final-project:${{ github.sha }}
+
+  # ⚙️ Stage 4: Configure Git
+  configure-git:
+    runs-on: ubuntu-latest
+    needs: build-and-push-image
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Set GitHub Remote with PAT
+        run: git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/SmarterOps/Final-Project.git
+
+  # 📝 Stage 5: Update Helm values.yaml & Push to Repo
+  update-helm-values:
+    runs-on: ubuntu-latest
+    needs: configure-git
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Update Helm values.yaml
+        run: |
+          sed -i 's/tag:.*/tag: "${{ github.sha }}"/' helm/values.yaml
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add helm/values.yaml
+          git diff --cached --quiet || git commit -m "Update Helm tag to ${{ github.sha }}"
+          git push origin main || echo "No changes to push"
