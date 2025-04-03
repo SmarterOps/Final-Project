@@ -87,4 +87,4 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           git add helm/values.yaml
           git diff --cached --quiet || git commit -m "Update Helm tag to ${{ github.sha }}"
-          git push origin main || echo "No changes to push"
+          git push origin main || echo "No changes to push" 
