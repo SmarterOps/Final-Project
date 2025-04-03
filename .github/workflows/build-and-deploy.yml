@@ -58,7 +58,9 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git pull --rebase origin main || echo "No changes to pull"
           git add helm/values.yaml
           git diff --cached --quiet || git commit -m "Update Helm tag to ${{ github.sha }}"
-          git push origin main || echo "No changes to push"
+          git stash || echo "Nothing to stash"
+          git pull --rebase origin master || echo "No changes to pull"
+          git stash pop || echo "Nothing to pop"
+          git push origin master || echo "No changes to push"
